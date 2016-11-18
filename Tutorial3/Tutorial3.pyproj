@@ -33,7 +33,6 @@
     <Folder Include="solomon_50\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="C101.txt" />
     <Content Include="solomon_100\C101.txt" />
     <Content Include="solomon_100\C201.txt" />
     <Content Include="solomon_100\R101.txt" />
