@@ -1,4 +1,4 @@
-#Marcin tu był22
+#Marcin tu był222
 import CW_Savings
 import csv
 
