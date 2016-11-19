@@ -1,3 +1,4 @@
+#Bartek tu był
 import CW_Savings
 import csv
 
