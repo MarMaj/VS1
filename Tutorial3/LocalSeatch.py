@@ -53,7 +53,7 @@ for folder in folders:
                         mySolution.get_objective()
                         print(mySolution)
                         a.writerows([[k, str(mySolution.objective)]])
-                        if(bestObjectiv > mySolution.objective):            # If actual solution is best solution then add to best Solution
+                        if(bestObjectiv > mySolution.objective):            # If actual solution is best solution then add to best Solution 9
                             bestObjectiv = mySolution.objective
                             bestSolution = mySolution
             bestSolutions.append(bestSolution)
