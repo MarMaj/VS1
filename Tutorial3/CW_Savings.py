@@ -254,13 +254,17 @@ class VRP_Solution:
                           lTab1 = [r.route[i+1], i+1]
                           lTab2 = [r.route[k], k]
                           if((lTab1 not in self.TabuTwoOpt) and (lTab2 not in self.TabuTwoOpt) and (lTab1 not in self.GlobalTabu) and (lTab2 not in self.GlobalTabu)):
+                              
                               newRoute1 = VRP_Route(r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:])
                               newRoute1.update_route(self.vrpdata)
                               if(newRoute1.tourValid):
                                   self.TabuTwoOpt.append(lTab1)
                                   self.TabuTwoOpt.append(lTab2)
-                                  r.route = newRoute1 #r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
-                                  r.update_route(self.vrpdata)
+                                  #r.route = newRoute1 #r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
+                                  #r.update_route(self.vrpdata)
+                                  loc = self.routes.index(r)
+                                  self.routes.remove(r)
+                                  self.routes.insert(loc, newRoute1)
                                   break
                   i += 1
 
