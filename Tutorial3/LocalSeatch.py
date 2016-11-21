@@ -17,40 +17,46 @@ for folder in folders:
         csvName = file[:-4] + ".csv"
         with open(csvName, 'w', newline='') as fp:
             a = csv.writer(fp, delimiter=',')
-            
-            for i in range(0, 1):                                           # Number of iteration all program
+            a.writerows([['0', str(mySolution.objective)]])
+
+
+
+            for i in range(0, 5):                                           # Number of iteration all program
                 print("-------------------------------------")
                 mySolution.savings_algorithm(1)
                 print(mySolution)
-                a.writerows([['0', str(mySolution.objective)]])
-        
                 for j in range(0, 3):                                      # Nuber of relocate and exchange iteration
                     for m in range(0, 6):                                   # Nuber of relocate iteration
                         k += 1
                         mySolution.relocate(0.7, 0.0001)
                         mySolution.get_objective()
-                        mySolution.cleare_tabu_relocate(50)
+                        mySolution.cleare_tabu_relocate(1000)
+                        mySolution.GlobalTabu += mySolution.TabuRelocate    # optional
+                        mySolution.clear_global_tabu(1000000000)            # optional
                         print(mySolution)
                         a.writerows([[k, str(mySolution.objective)]])
                         if(bestObjectiv > mySolution.objective):            # If actual solution is best solution then add to best Solution
                             bestObjectiv = mySolution.objective
                             bestSolution = mySolution
-
                     for n in range(0, 2):                                   # Nuber of  exchange iteration
                         k += 1
-                        mySolution.exchange(0.7, 0)
+                        mySolution.exchange(0.7, 0.0000001)
                         mySolution.get_objective()
-                        mySolution.clear_tabu_exchange(1000000)
+                        mySolution.clear_tabu_exchange(1000)
+                        mySolution.GlobalTabu += mySolution.TabuRelocate    # optional
+                        mySolution.clear_global_tabu(1000000000)            # optional
                         print(mySolution)
                         a.writerows([[k, str(mySolution.objective)]])
                         if(bestObjectiv > mySolution.objective):            # If actual solution is best solution then add to best Solution
                             bestObjectiv = mySolution.objective
                             bestSolution = mySolution
-
-                    for o in range(0,4):
+                    for o in range(0, 4):
                         k += 1
-                        mySolution.two_opt(0.7)
+                        mySolution.two_opt(0.7, 0.000000001)
                         mySolution.get_objective()
+                        mySolution.clear_tabu_two_opt(1000)
+                        mySolution.GlobalTabu += mySolution.TabuRelocate    # optional
+                        mySolution.clear_global_tabu(1000000000)            # optional
                         print(mySolution)
                         a.writerows([[k, str(mySolution.objective)]])
                         if(bestObjectiv > mySolution.objective):            # If actual solution is best solution then add to best Solution 9

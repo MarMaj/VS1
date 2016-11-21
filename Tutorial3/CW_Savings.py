@@ -95,6 +95,8 @@ class VRP_Solution:
         self.solutionValid = False
         self.TabuRelocate = []
         self.TabuExchange = []
+        self.TabuTwoOpt = []
+        self.GlobalTabu = []
 
     def __str__(self):
         """Convert a solution into a string.
@@ -177,9 +179,9 @@ class VRP_Solution:
                         newRoute = VRP_Route(myCopy[0:k] + [item] + myCopy[k:])
                         newRoute.update_route(self.vrpdata)
                         if ((newRoute.distance < r.distance) and (newRoute.tourValid) and (random.random() < p)) or ((random.random() < p2) and (newRoute.distance > r.distance) ):
-                            lTab = [nrRoute, r.route[i], k]
-                            if lTab not in self.TabuRelocate:
-                                self.TabuRelocate.append([nrRoute, r.route[i], i])
+                            lTab = [r.route[i], k]
+                            if ((lTab not in self.TabuRelocate) and (lTab not in self.GlobalTabu)):
+                                self.TabuRelocate.append([r.route[i], i])
                                 print(newRoute)
                                 loc = self.routes.index(r)
                                 self.routes.remove(r)
@@ -216,38 +218,54 @@ class VRP_Solution:
                             
                             if ((((newRoute1.distance + newRoute2.distance) < (r.distance + t.distance)) and (newRoute1.tourValid) and (newRoute2.tourValid) and (random.random() < p)) 
                                 or ((random.random() < p2) and (newRoute1.distance + newRoute2.distance) > (r.distance + t.distance)) and (newRoute1.tourValid) and (newRoute2.tourValid)):
-                                lTab1 = [nrRoute1, r.route[i], j]
-                                lTab2 = [nrRoute2, t.route[j], i]
-                                if ((lTab1 not in self.TabuExchange) and (lTab2 not in self.TabuExchange)):
-                                    self.TabuExchange.append([nrRoute1, r.route[i-1], i])
-                                    self.TabuExchange.append([nrRoute2, t.route[j-1], j])
+                                lTab1 = [r.route[i], j]
+                                lTab2 = [t.route[j], i]
+                                if ((lTab1 not in self.TabuExchange) and (lTab2 not in self.TabuExchange) and (lTab1 not in self.GlobalTabu) and (lTab2 not in self.GlobalTabu)):
+                                    self.TabuExchange.append([r.route[i-1], i])
+                                    self.TabuExchange.append([t.route[j-1], j])
+                                    print(newRoute1)
+                                    print(newRoute2)
+                                    loc1 = self.routes.index(r)
+                                    loc2 = self.routes.index(t)
+                                    self.routes.remove(r)
+                                    self.routes.remove(t)
+                                    self.routes.insert(loc1, newRoute1)
+                                    self.routes.insert(loc2, newRoute2)
+                                    r = newRoute1
+                                    t = newRoute2
+                                    break
                                 else:
                                     print("asd")
-                                print(newRoute1)
-                                print(newRoute2)
-                                loc1 = self.routes.index(r)
-                                loc2 = self.routes.index(t)
-                                self.routes.remove(r)
-                                self.routes.remove(t)
-                                self.routes.insert(loc1, newRoute1)
-                                self.routes.insert(loc2, newRoute2)
-                                r = newRoute1
-                                t = newRoute2
-                                break
+                                
 
     def clear_tabu_exchange(self, n):
         criticalNumber = n
         while (len(self.TabuExchange) > criticalNumber):
             self.TabuExchange.remove(self.TabuExchange[0])
 
-    def two_opt(self, p):
+    def two_opt(self, p, p2):
         for r in self.routes:
             i = 0
             while i < len(r.route) - 3:
                   for k in range(i+2, len(r.route)-1):
                       val1 = self.vrpdata.DistMatrix[r.route[i]][r.route[i+1]] + self.vrpdata.DistMatrix[r.route[k]][r.route[k+1]]
                       val2 = self.vrpdata.DistMatrix[r.route[i]][r.route[k]] + self.vrpdata.DistMatrix[r.route[i+1]][r.route[k+1]]
-                      if ((val1>val2) and (random.random() < p)):
-                          r.route = r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
-                          break
+                      if (((val1>val2) and (random.random() < p)) or ((val1<=val2) and (random.random() < p2))):
+                          lTab1 = [r.route[i+1], i+1]
+                          lTab2 = [r.route[k], k]
+                          if((lTab1 not in self.TabuTwoOpt) and (lTab2 not in self.TabuTwoOpt) and (lTab1 not in self.GlobalTabu) and (lTab2 not in self.GlobalTabu)):
+                              self.TabuTwoOpt.append(lTab1)
+                              self.TabuTwoOpt.append(lTab2)
+                              r.route = r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
+                              break
                   i += 1
+
+    def clear_tabu_two_opt(self, n):
+        criticalNumber = n
+        while (len(self.TabuTwoOpt) > criticalNumber):
+            self.TabuTwoOpt.remove(self.TabuTwoOpt[0])
+
+    def clear_global_tabu(self, n):
+        criticalNumber = n
+        while (len(self.GlobalTabu) > criticalNumber):
+            self.GlobalTabu.remove(self.GlobalTabu[0])
