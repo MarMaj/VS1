@@ -239,3 +239,15 @@ class VRP_Solution:
         criticalNumber = n
         while (len(self.TabuExchange) > criticalNumber):
             self.TabuExchange.remove(self.TabuExchange[0])
+
+    def two_opt(self, p):
+        for r in self.routes:
+            i = 0
+            while i < len(r.route) - 3:
+                  for k in range(i+2, len(r.route)-1):
+                      val1 = self.vrpdata.DistMatrix[r.route[i]][r.route[i+1]] + self.vrpdata.DistMatrix[r.route[k]][r.route[k+1]]
+                      val2 = self.vrpdata.DistMatrix[r.route[i]][r.route[k]] + self.vrpdata.DistMatrix[r.route[i+1]][r.route[k+1]]
+                      if ((val1>val2) and (random.random() < p)):
+                          r.route = r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
+                          break
+                  i += 1
