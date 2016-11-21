@@ -21,7 +21,7 @@ for folder in folders:
 
 
 
-            for i in range(0, 5):                                           # Number of iteration all program
+            for i in range(0, 3):                                           # Number of iteration all program
                 print("-------------------------------------")
                 mySolution.savings_algorithm(1)
                 print(mySolution)
@@ -65,6 +65,7 @@ for folder in folders:
             bestSolutions.append(bestSolution)
         break
     break
+print(bestSolution)
 
 
             
