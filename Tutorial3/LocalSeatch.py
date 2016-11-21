@@ -17,11 +17,12 @@ for folder in folders:
         csvName = file[:-4] + ".csv"
         with open(csvName, 'w', newline='') as fp:
             a = csv.writer(fp, delimiter=',')
+            mySolution.savings_algorithm(1)
             a.writerows([['0', str(mySolution.objective)]])
 
 
 
-            for i in range(0, 3):                                           # Number of iteration all program
+            for i in range(0, 5):                                           # Number of iteration all program
                 print("-------------------------------------")
                 mySolution.savings_algorithm(1)
                 print(mySolution)

@@ -260,11 +260,11 @@ class VRP_Solution:
                               if(newRoute1.tourValid):
                                   self.TabuTwoOpt.append(lTab1)
                                   self.TabuTwoOpt.append(lTab2)
-                                  #r.route = newRoute1 #r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
-                                  #r.update_route(self.vrpdata)
-                                  loc = self.routes.index(r)
-                                  self.routes.remove(r)
-                                  self.routes.insert(loc, newRoute1)
+                                  r.route = r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
+                                  r.update_route(self.vrpdata)
+                                  #loc = self.routes.index(r)
+                                  #self.routes.remove(r)
+                                  #self.routes.insert(loc, newRoute1)
                                   break
                   i += 1
 
