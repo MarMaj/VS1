@@ -12,6 +12,7 @@ class VRP:
 
         Read all the data from the instancefile (string) - text file according to Solomon format"""
         coord = []; demand = []; timew = []; servicet = []                                          # initialize lists
+        self.InstanceFile = instancefile
         with open(instancefile,"r") as iFile:               # read data from file
             self.InstanceName = iFile.readline().strip()    # name of instamce
             iFile.readline(); iFile.readline(); iFile.readline()    # skip lines
@@ -167,7 +168,7 @@ class VRP_Solution:
             self.get_objective()
         return self.objective
 
-    def relocate(self, p, p2):
+    def relocate(self, p, p2, t = True):
         nrRoute = 1
         for r in self.routes:
             i = 0
@@ -178,9 +179,10 @@ class VRP_Solution:
                     if i != k:
                         newRoute = VRP_Route(myCopy[0:k] + [item] + myCopy[k:])
                         newRoute.update_route(self.vrpdata)
-                        if ((newRoute.distance < r.distance) and (newRoute.tourValid) and (random.random() < p)) or ((random.random() < p2) and (newRoute.distance > r.distance) ):
+                        if ((newRoute.distance < r.distance) and (newRoute.tourValid) and (random.random() < p)) \
+                        or ((random.random() < p2) and (newRoute.distance > r.distance) ):
                             lTab = [r.route[i], k]
-                            if ((lTab not in self.TabuRelocate) and (lTab not in self.GlobalTabu)):
+                            if ((lTab not in self.TabuRelocate) and ((lTab not in self.GlobalTabu) or (t != True))):
                                 self.TabuRelocate.append([r.route[i], i])
                                 print(newRoute)
                                 loc = self.routes.index(r)
@@ -196,7 +198,7 @@ class VRP_Solution:
         while (len(self.TabuRelocate) > criticalNumber):
             self.TabuRelocate.remove(self.TabuRelocate[0])
 
-    def exchange(self, p, p2):
+    def exchange(self, p, p2, t = True):
         nrRoute1=0
         nrRoute2=0
         for r in self.routes:
@@ -215,14 +217,14 @@ class VRP_Solution:
                             newRoute2 = VRP_Route(myCopy2[0:j] + [item1] + myCopy2[j:])
                             newRoute1.update_route(self.vrpdata)
                             newRoute2.update_route(self.vrpdata)
-                            
-                            if ((((newRoute1.distance + newRoute2.distance) < (r.distance + t.distance)) and (newRoute1.tourValid) and (newRoute2.tourValid) and (random.random() < p)) 
+                            if ((((newRoute1.distance + newRoute2.distance) < (r.distance + t.distance)) and (newRoute1.tourValid) and (newRoute2.tourValid) and (random.random() < p)) \
                                 or ((random.random() < p2) and (newRoute1.distance + newRoute2.distance) > (r.distance + t.distance)) and (newRoute1.tourValid) and (newRoute2.tourValid)):
                                 lTab1 = [r.route[i], j]
                                 lTab2 = [t.route[j], i]
-                                if ((lTab1 not in self.TabuExchange) and (lTab2 not in self.TabuExchange) and (lTab1 not in self.GlobalTabu) and (lTab2 not in self.GlobalTabu)):
-                                    self.TabuExchange.append([r.route[i-1], i])
-                                    self.TabuExchange.append([t.route[j-1], j])
+                                if ((lTab1 not in self.TabuExchange) and (lTab2 not in self.TabuExchange) and \
+                                    (((lTab1 not in self.GlobalTabu) and (lTab2 not in self.GlobalTabu)) or (t != True))):
+                                    self.TabuExchange.append([r.route[i], i])
+                                    self.TabuExchange.append([t.route[j], j])
                                     print(newRoute1)
                                     print(newRoute2)
                                     loc1 = self.routes.index(r)
@@ -234,8 +236,6 @@ class VRP_Solution:
                                     r = newRoute1
                                     t = newRoute2
                                     break
-                                else:
-                                    print("asd")
                                 
 
     def clear_tabu_exchange(self, n):
@@ -243,7 +243,7 @@ class VRP_Solution:
         while (len(self.TabuExchange) > criticalNumber):
             self.TabuExchange.remove(self.TabuExchange[0])
 
-    def two_opt(self, p, p2):
+    def two_opt(self, p, p2, t = True):
         for r in self.routes:
             i = 0
             while i < len(r.route) - 3:
@@ -253,7 +253,8 @@ class VRP_Solution:
                       if (((val1>val2) and (random.random() < p)) or ((val1<=val2) and (random.random() < p2))):
                           lTab1 = [r.route[i+1], i+1]
                           lTab2 = [r.route[k], k]
-                          if((lTab1 not in self.TabuTwoOpt) and (lTab2 not in self.TabuTwoOpt) and (lTab1 not in self.GlobalTabu) and (lTab2 not in self.GlobalTabu)):
+                          if((lTab1 not in self.TabuTwoOpt) and (lTab2 not in self.TabuTwoOpt) and \
+                             (((lTab1 not in self.GlobalTabu) and (lTab2 not in self.GlobalTabu)) or (t != True))):
                               
                               newRoute1 = VRP_Route(r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:])
                               newRoute1.update_route(self.vrpdata)
@@ -262,9 +263,6 @@ class VRP_Solution:
                                   self.TabuTwoOpt.append(lTab2)
                                   r.route = r.route[:i+1] + r.route[k:i:-1] + r.route[k+1:]
                                   r.update_route(self.vrpdata)
-                                  #loc = self.routes.index(r)
-                                  #self.routes.remove(r)
-                                  #self.routes.insert(loc, newRoute1)
                                   break
                   i += 1
 
